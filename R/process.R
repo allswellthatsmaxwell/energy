@@ -21,7 +21,7 @@ weather <- readr::read_csv(files$weather$train) %>%
   dplyr::mutate(site_id = factor(site_id))
 
 weather %<>% 
-  dplyr::mutate(day = as.integer(format(timestamp, "%d")),
+  dplyr::mutate(day = as.integer(format(timestamp, "%j")),
                 week = as.integer(format(timestamp, "%U")))
 
 buildings_per_site <- buildings %>%
@@ -29,16 +29,18 @@ buildings_per_site <- buildings %>%
   dplyr::summarize(dplyr::n())
 buildings_per_site
 
-## No, this isn't weekly! Rows in weather are by the minute, not the day.
-#weather %<>% 
-#  dplyr::arrange(site_id, timestamp) %>%
-#  dplyr::group_by(site_id) %>%
-#  dplyr::mutate(weekly_avg_air_temperature = zoo::rollapply(
-#    air_temperature, 7, mean, align='left', fill=NA))
-  
-site_temps_plot <- weather %>%
-  ggplot(aes(x = timestamp, y = weekly_avg_air_temperature)) +
+## Rows in weather are by the minute, not the day.
+daily_averages <- weather %>%
+  dplyr::group_by(site_id, day) %>%
+  dplyr::summarize(avg_air_temperature = mean(air_temperature)) %>%
+  dplyr::arrange(site_id, day) %>%
+  dplyr::group_by(site_id) %>%
+  dplyr::mutate(rolling_air_temperature = zoo::rollapply(
+    avg_air_temperature, 7, FUN = mean, align = 'left', fill = NA))
+
+site_temps_plot <- daily_averages %>%
+  ggplot(aes(x = day, y = rolling_air_temperature, color = site_id, group = site_id)) +
   geom_line() +
-  theme_bw() +
-  facet_wrap(~site_id)
+  theme_bw() 
+
 site_temps_plot
