@@ -41,6 +41,6 @@ daily_averages <- weather %>%
 site_temps_plot <- daily_averages %>%
   ggplot(aes(x = day, y = rolling_air_temperature, color = site_id, group = site_id)) +
   geom_line() +
-  theme_bw() 
+  theme_bw()
 
 site_temps_plot
