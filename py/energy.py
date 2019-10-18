@@ -40,11 +40,17 @@ def merge_data(weather_df, meter_df, buildings_df):
 
 def define_rmsle(n_obs: int):
     def rmsle(y_true, y_pred):
-        log_difference = (K.log(y_pred + 1) -
-                          K.log(y_true + 1))
+        log_difference = (K.log(y_pred + K.constant(1)) -
+                          K.log(y_true + K.constant(1)))
         scaling = 1 / n_obs
-        return K.sqrt(K.prod(K.constant(scaling),
-                            K.sum(log_difference**2)))
+        raised_log = K.pow(log_difference, 2)
+        squared_log_raised = K.square(raised_log)
+        sum_of_squared_log_raised = K.sum(K.pow(log_difference, 2))
+        #scaled_sum_of_squared_log_raised = K.prod(
+        #    K.constant(scaling),
+        #    sum_of_squared_log_raised)
+        scaled_sum_of_squared_log_raised = scaling * sum_of_squared_log_raised
+        return K.sqrt(scaled_sum_of_squared_log_raised)
     return rmsle
 
 class MissingStrategy(Enum):
