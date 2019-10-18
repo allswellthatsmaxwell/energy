@@ -1,7 +1,9 @@
 import pandas as pd, numpy as np
 from os.path import join
+from enum import Enum
 
 import keras.backend as K
+from sklearn.impute import SimpleImputer
 
 DATA_DIR = '../data'
 class Data:    
@@ -36,3 +38,27 @@ def define_rmsle(n_obs: int):
         return K.sqrt(K.prod(K.constant(scaling),
                             K.sum(log_difference**2)))
     return rmsle
+
+class MissingStrategy(Enum):
+    REMOVE_ROW = 1
+    USE_COLUMN_MEAN = 2
+    USE_COLUMN_MEDIAN = 3
+    PREDICT = 4
+
+def handle_missing_predictor_values(X, y, missing_strategy):
+    if missing_strategy == MissingStrategy.REMOVE_ROW:
+        nan_rowinds = X_df.apply(lambda row: pd.isnull(row).any(), axis=1)
+        X = X[~nan_rowinds]
+        y = y[~nan_rowinds]
+    elif missing_strategy in (MissingStrategy.USE_COLUMN_MEAN, 
+                              MissingStrategy.USE_COLUMN_MEDIAN):
+        if missing_strategy == MissingStrategy.USE_COLUMN_MEAN:
+            strategy = 'mean'
+        else:
+            strategy = 'median'
+        imp = SimpleImputer(missing_values=np.nan, strategy=strategy)
+        imp = imp.fit(X)  
+        X = imp.transform(X)
+    else:
+        raise NotImplementedError(f"{missing_strategy} not implemented")
+    return X, y
