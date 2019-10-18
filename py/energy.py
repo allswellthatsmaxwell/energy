@@ -6,6 +6,7 @@ import keras.backend as K
 from sklearn.impute import SimpleImputer
 
 DATA_DIR = '../data'
+INTERMEDIATE_DIR = '../intermediate'
 class Data:    
     class Weather:
         def __init__(self, max_rows=None):
@@ -23,7 +24,14 @@ class Data:
         def __init__(self):
             file = join(DATA_DIR, "building_metadata.csv")
             self.data = pd.read_csv(file)
-        
+
+    class Merged:
+        def __init__(self, max_rows=None):
+            self.train_file = join(INTERMEDIATE_DIR, "combined_train.csv")
+            self.data = pd.read_csv(self.train_file, nrows=max_rows)
+            
+    
+            
 def merge_data(weather_df, meter_df, buildings_df):
     return (
         meter_df.
