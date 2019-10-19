@@ -28,9 +28,8 @@ class Data:
     class Merged:
         def __init__(self, max_rows=None):
             self.train_file = join(INTERMEDIATE_DIR,
-                                   "combined_train_16000000.csv")
+                                   "combined_data_16000000.csv")
             self.data = pd.read_csv(self.train_file, nrows=max_rows)
-
 
 def merge_data(weather_df, meter_df, buildings_df):
     return (
@@ -46,9 +45,6 @@ def define_rmsle(n_obs: int):
         raised_log = K.pow(log_difference, 2)
         squared_log_raised = K.square(raised_log)
         sum_of_squared_log_raised = K.sum(K.pow(log_difference, 2))
-        #scaled_sum_of_squared_log_raised = K.prod(
-        #    K.constant(scaling),
-        #    sum_of_squared_log_raised)
         scaled_sum_of_squared_log_raised = scaling * sum_of_squared_log_raised
         return K.sqrt(scaled_sum_of_squared_log_raised)
     return rmsle
@@ -76,3 +72,8 @@ def handle_missing_predictor_values(X, y, missing_strategy):
     else:
         raise NotImplementedError(f"{missing_strategy} not implemented")
     return X, y
+
+def evaluate_model(model, validation_df):
+    ## We should make one of those SKLearn pipeline things
+    ## to prepare each df the same.
+    pass
