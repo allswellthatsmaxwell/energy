@@ -30,9 +30,8 @@ class Data:
             self.train_file = join(INTERMEDIATE_DIR,
                                    "combined_train_16000000.csv")
             self.data = pd.read_csv(self.train_file, nrows=max_rows)
-            
-    
-            
+
+
 def merge_data(weather_df, meter_df, buildings_df):
     return (
         meter_df.
