@@ -27,7 +27,8 @@ class Data:
 
     class Merged:
         def __init__(self, max_rows=None):
-            self.train_file = join(INTERMEDIATE_DIR, "combined_train.csv")
+            self.train_file = join(INTERMEDIATE_DIR,
+                                   "combined_train_16000000.csv")
             self.data = pd.read_csv(self.train_file, nrows=max_rows)
             
     
