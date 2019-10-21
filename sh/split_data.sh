@@ -16,7 +16,6 @@ total_size=`wc -l $total_file | cut -f1 -d ' '`
 total_size=`echo $total_size - 1 | bc` ## uncount header
 val_size=`echo "$total_size - $train_size" | bc`
 header=`head -1 $total_file`
-echo $header > $train_file
 head -"$train_size" "$total_file" >> "$train_file"
 
 echo $header > $val_file
